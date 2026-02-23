@@ -1,41 +1,26 @@
 /**
  * Tracks selected indices. Supports single and multi modes.
- * Multi: plain click = select one, Shift+click = range, Ctrl/Cmd+click = toggle.
- * Single: click always selects exactly one row.
+ * Single: click toggles one row; at most one selected at a time.
+ * Multi: each click toggles that row independently.
  */
 function createRowSelection({ mode = 'multi', onSelectionChange }) {
 
     const selected = new Set()
-    let anchor = null  // For shift+click range selection
 
-    function handleRowClick(index, event) {
+    function handleRowClick(index) {
         if (mode === 'single') {
-            selected.clear()
-            selected.add(index)
-            anchor = index
-        } else {
-            // Multi mode
-            if (event && event.shiftKey && anchor !== null) {
-                // Range select from anchor to index
-                const start = Math.min(anchor, index)
-                const end = Math.max(anchor, index)
-                selected.clear()
-                for (let i = start; i <= end; i++) {
-                    selected.add(i)
-                }
-            } else if (event && (event.ctrlKey || event.metaKey)) {
-                // Toggle
-                if (selected.has(index)) {
-                    selected.delete(index)
-                } else {
-                    selected.add(index)
-                }
-                anchor = index
+            if (selected.has(index)) {
+                selected.delete(index)
             } else {
-                // Plain click — select one
                 selected.clear()
                 selected.add(index)
-                anchor = index
+            }
+        } else {
+            // Multi mode — toggle
+            if (selected.has(index)) {
+                selected.delete(index)
+            } else {
+                selected.add(index)
             }
         }
 
@@ -54,7 +39,6 @@ function createRowSelection({ mode = 'multi', onSelectionChange }) {
 
     function clearSelection() {
         selected.clear()
-        anchor = null
         if (onSelectionChange) {
             onSelectionChange([])
         }
@@ -66,7 +50,6 @@ function createRowSelection({ mode = 'multi', onSelectionChange }) {
 
     function destroy() {
         selected.clear()
-        anchor = null
     }
 
     return { handleRowClick, getSelectedIndices, getSelectedData, clearSelection, isSelected, destroy }

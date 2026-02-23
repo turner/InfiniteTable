@@ -53,7 +53,8 @@ function createInfiniteTable({ container, columns, columnDefs, selectionStyle = 
         const row = event.target.closest('.infinite-table__row')
         if (!row) return
         const displayIndex = parseInt(row.dataset.index, 10)
-        selection.handleRowClick(displayIndex, event)
+        const originalIndex = displayData[displayIndex]
+        selection.handleRowClick(originalIndex)
     })
 
     // Append to container
@@ -67,7 +68,7 @@ function createInfiniteTable({ container, columns, columnDefs, selectionStyle = 
         const originalIndex = displayData[displayIndex]
         const rowData = data[originalIndex]
         const row = columnRenderer.renderDataRow(rowData, displayIndex)
-        if (selection.isSelected(displayIndex)) {
+        if (selection.isSelected(originalIndex)) {
             row.classList.add('infinite-table__row--selected')
         }
         return row
@@ -77,13 +78,20 @@ function createInfiniteTable({ container, columns, columnDefs, selectionStyle = 
         const originalIndex = displayData[displayIndex]
         const rowData = data[originalIndex]
         columnRenderer.updateDataRow(rowEl, rowData, displayIndex)
-        if (selection.isSelected(displayIndex)) {
+        if (selection.isSelected(originalIndex)) {
             rowEl.classList.add('infinite-table__row--selected')
         }
     }
 
     function handleFilterChange(filteredIndices) {
-        selection.clearSelection()
+        const query = searchFilter.getElement().value.trim().toLowerCase()
+        if (query === ':selected') {
+            displayData = selection.getSelectedIndices()
+            scroller.setRowCount(displayData.length)
+            scroller.scrollToTop()
+            updateResultCount()
+            return
+        }
         if (filteredIndices === null) {
             displayData = data.map((_, i) => i)
         } else {
@@ -128,12 +136,18 @@ function createInfiniteTable({ container, columns, columnDefs, selectionStyle = 
     }
 
     function getSelectedData() {
-        const selectedDisplayIndices = selection.getSelectedIndices()
-        return selectedDisplayIndices.map(di => data[displayData[di]]).filter(d => d !== undefined)
+        return selection.getSelectedIndices().map(i => data[i]).filter(d => d !== undefined)
     }
 
     function getSelectedDisplayIndices() {
-        return selection.getSelectedIndices()
+        const originalIndices = new Set(selection.getSelectedIndices())
+        const result = []
+        for (let di = 0; di < displayData.length; di++) {
+            if (originalIndices.has(displayData[di])) {
+                result.push(di)
+            }
+        }
+        return result
     }
 
     function clearSelection() {

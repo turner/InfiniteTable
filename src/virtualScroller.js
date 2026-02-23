@@ -131,6 +131,9 @@ function createVirtualScroller({ container, rowHeight = 28, bufferSize = 20, ren
         rowCount = count
         measureRowHeight()
         updateSentinelHeight()
+        lastRenderStart = -1
+        lastRenderEnd = -1
+        removeAllChildren()
         renderVisibleRows()
     }
 
