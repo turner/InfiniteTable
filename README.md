@@ -8,7 +8,8 @@ InfiniteTable renders only the rows visible in the viewport (plus a small buffer
 
 - **Virtual scrolling** — Fixed row height enables O(1) index calculation. Only ~60-80 DOM rows exist at any time, even with 500K+ data rows.
 - **Real-time search** — Debounced full-text filtering across all visible columns. Results update as you type.
-- **Row selection** — Single and multi-select modes. Multi supports plain click (select one), Shift+click (range), and Ctrl/Cmd+click (toggle).
+- **Row selection** — Single and multi-select modes. Click toggles selection in both modes. Single mode allows at most one selected row; multi mode allows any number.
+- **`:selected` filter** — Type `:selected` in the search box to narrow the view to only your selected rows.
 - **Column definitions** — Optional `columnDefs` map overrides display titles (e.g. `AssayType` → "Assay Type").
 - **Bootstrap modal wrapper** — `createModalTable` wraps InfiniteTable in a Bootstrap 5 modal with lazy data loading, a spinner, and an OK/Cancel footer. API-compatible with [data-modal](https://github.com/igvteam/data-modal)'s `ModalTable`.
 - **No dependencies** — Pure ES6 modules. No jQuery, no build step required.
@@ -116,7 +117,7 @@ Then visit `http://localhost:3000/test/<page>.html`.
 | [basic.html](test/basic.html) | Renders 50 rows with 4 columns. Verify headers, cell content, and alternating row colors. |
 | [large-dataset.html](test/large-dataset.html) | Generates 500K rows. Verify smooth scrolling and flat DOM node count (~60-80 nodes). Performance stats displayed at top. |
 | [search.html](test/search.html) | 10K rows with real-time filtering. Type to filter, verify result count updates and scroll resets to top. |
-| [selection.html](test/selection.html) | Two tables side by side — multi-select and single-select. Test click, Shift+click, and Ctrl/Cmd+click behavior. |
+| [selection.html](test/selection.html) | Two tables side by side — multi-select and single-select. Test click-to-toggle behavior in both modes. |
 | [modal.html](test/modal.html) | Bootstrap 5 modal with simulated async data loading (500ms delay). Verify spinner, row selection, and OK handler output. |
 | [encode-like.html](test/encode-like.html) | Realistic ENCODE-style dataset with `columnDefs` title overrides and a `rowHandler` that transforms selections into `{name, url, color, metadata}` track config objects. |
 
